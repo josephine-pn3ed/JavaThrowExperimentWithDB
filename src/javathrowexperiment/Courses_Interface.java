@@ -60,7 +60,7 @@ public class Courses_Interface {
             String sql = "SELECT * FROM Schedule";
             ResultSet rs = stmt.executeQuery(sql);
 
-            System.out.println("\n\t\t\t *** Schedules ***");
+            System.out.println("\n\t    *** Schedules ***\n");
             c = new ArrayList();
             while (rs.next()) {
                 int id = rs.getInt("id");
@@ -85,7 +85,7 @@ public class Courses_Interface {
 //        System.out.println("Retrieved!");
     }
 
-    public void createToDB() {
+    public boolean createToDB() {
         java.sql.Connection conn;
         Statement stmt;
         String title, unit, schedule;
@@ -123,9 +123,10 @@ public class Courses_Interface {
             e.printStackTrace();
         }
         System.out.println("Saved!");
+        return true;
     }
 
-    public void update(int acc_id) throws IOException {
+    public boolean update(int acc_id) throws IOException {
         java.sql.Connection conn;
         Statement stmt;
         String title = null, unit = null, schedule = null;
@@ -142,8 +143,8 @@ public class Courses_Interface {
             stmt = conn.createStatement();
             for (int i = 0; i < c.size(); i++) {
                 if (c.get(i).getAccount_id() == acc_id) {
-                    System.out.println("\t\t\t*** Schedules ***");
-                    System.out.println(c.get(i).getId() + "\t" + c.get(i).getAccount_id() + "\t" + c.get(i).getTitle() + "\t" + c.get(i).getUnit() + "\t" + c.get(i).getSchedule());
+                    System.out.println("\t\t *** Schedules ***\n");
+                    System.out.println(c.get(i).getId() + "\t\t" + c.get(i).getAccount_id() + "\t\t" + c.get(i).getTitle() + "\t\t" + c.get(i).getUnit() + "\t\t" + c.get(i).getSchedule());
                     System.out.print("\nEnter new title/subject : ");
                     title = input1.nextLine();
                     System.out.print("Enter new units : ");
@@ -154,9 +155,11 @@ public class Courses_Interface {
                     }
                     System.out.print("Enter new schedule : ");
                     schedule = input3.nextLine();
-                    String sql = "UPDATE Schedule SET `ACC_ID` = '" + account_id + "', `title` = '" + title + "', `unit` = '" + unit + "', `schedule` = '" + schedule + "' WHERE `ID` = '" + c.get(i).getId() + "'";
+                    String sql = "UPDATE Schedule SET `ACC_ID` = '" + acc_id + "', `title` = '" + title + "', `unit` = '" + unit + "', `schedule` = '" + schedule + "' WHERE `ID` = '" + c.get(i).getId() + "'";
                     System.out.println(sql);
                     stmt.executeUpdate(sql);
+                    System.out.println("Saved!");
+                    return true;
                 } else if (c.get(i).getAccount_id() != acc_id && i == c.size() - 1 && title == null && unit == null && schedule == null) {
                     System.out.print("Enter title/subject : ");
                     title = input1.nextLine();
@@ -171,8 +174,27 @@ public class Courses_Interface {
                     String sql = "INSERT INTO Schedule (ACC_ID, title, unit, schedule) VALUES ('" + account_id + "', '" + title + "', '" + unit + "', '" + schedule + "')";;
                     System.out.println(sql);
                     stmt.executeUpdate(sql);
-                    break;
+                    System.out.println("Saved!");
+                    return true;
                 }
+            }
+            if (acc_id == 1) {
+                System.out.println("\t\t    *** Schedules ***");
+                System.out.print("Enter title/subject : ");
+                title = input1.nextLine();
+                System.out.print("Enter units : ");
+                unit = input2.nextLine();
+                while (Check.isString(unit)) {
+                    System.out.println("Units is not a string.");
+                    update(acc_id);
+                }
+                System.out.print("Enter schedule : ");
+                schedule = input3.nextLine();
+                String sql = "INSERT INTO Schedule (ACC_ID, title, unit, schedule) VALUES ('" + account_id + "', '" + title + "', '" + unit + "', '" + schedule + "')";;
+                System.out.println(sql);
+                stmt.executeUpdate(sql);
+                System.out.println("Saved!");
+                return true;
             }
             stmt.close();
             conn.close();
@@ -184,7 +206,7 @@ public class Courses_Interface {
             e.printStackTrace();
         }
         System.out.println("Saved!");
-
+        return false;
     }
 
     public void delete(int acc_id) {

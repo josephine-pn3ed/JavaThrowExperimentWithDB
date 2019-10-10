@@ -28,12 +28,12 @@ import java.util.List;
  * @author morrejo_sd2023
  */
 public class Accounts_Interface {
-    
+
     ArrayList<Accounts> a = new ArrayList();
     Scanner input1 = new Scanner(System.in);
     Scanner input2 = new Scanner(System.in);
     Scanner input3 = new Scanner(System.in);
-    
+
     static final String JDBC_DRIVER = "com.mysql.jdbc.Driver";
     static final String DB_URL = "jdbc:mysql://localhost/account";
 
@@ -43,7 +43,7 @@ public class Accounts_Interface {
 
     public Accounts_Interface() {
     }
-    
+
     public void retrieveDatabase() {
         Connection conn;
         Statement stmt;
@@ -59,21 +59,26 @@ public class Accounts_Interface {
             //STEP 4: Execute a query
 //            System.out.println("Creating statement...");
             stmt = conn.createStatement();
-            
+
             String sql = "SELECT * FROM account";
             ResultSet rs = stmt.executeQuery(sql);
 
             System.out.println("--- RETRIEVE ---");
-            System.out.println("\n\t\t\t*** Accounts ***");
-            
+            System.out.println("\n\t\t*** Accounts ***\n");
+
             while (rs.next()) {
                 int id = rs.getInt("id");
                 String username = rs.getString("username");
                 String password = rs.getString("password");
-                System.out.println(id + "\t" + username + "\t" + password + "\t");
+                System.out.println(id + "\t\t" + username + "\t\t" + password + "\t\t");
                 a.add(new Accounts(id, username, password));
             }
-            account_id = a.get(a.size()-1).getAcc_id();
+            if (a.size() == 0) {
+                account_id = 1;
+            } else {
+                account_id = a.get(a.size() - 1).getAcc_id();
+
+            }
 //            STEP 6: Clean-up environment
             rs.close();
             stmt.close();
@@ -84,10 +89,10 @@ public class Accounts_Interface {
         } catch (Exception e) {
             //Handle errors for Class.forName
             e.printStackTrace();
-        } 
+        }
 //        System.out.println("Retrieved!");
     }
-    
+
     public void createToDB() {
         Connection conn;
         Statement stmt;
@@ -136,8 +141,8 @@ public class Accounts_Interface {
 //            System.out.println("Creating statement...");
             stmt = conn.createStatement();
             String sql = "INSERT INTO Account (username, password) VALUES ";
-            
-            sql += "('"+username+"', '"+hash(password.toCharArray())+"')";
+
+            sql += "('" + username + "', '" + hash(password.toCharArray()) + "')";
             System.out.println(sql);
             stmt.executeUpdate(sql);
             ++account_id;

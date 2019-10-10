@@ -30,7 +30,10 @@ public class Personal_Information_Interface {
     Scanner input1 = new Scanner(System.in);
     Scanner input2 = new Scanner(System.in);
     Scanner input3 = new Scanner(System.in);
-    
+    Scanner input4 = new Scanner(System.in);
+    Scanner input5 = new Scanner(System.in);
+    Scanner input6 = new Scanner(System.in);
+
     static final String JDBC_DRIVER = "com.mysql.jdbc.Driver";
     static final String DB_URL = "jdbc:mysql://localhost/account";
 
@@ -41,7 +44,7 @@ public class Personal_Information_Interface {
     public Personal_Information_Interface() {
         pi = new ArrayList();
     }
-    
+
     public void retrieveDatabase() {
         java.sql.Connection conn;
         Statement stmt;
@@ -56,13 +59,13 @@ public class Personal_Information_Interface {
             //STEP 4: Execute a query
 //            System.out.println("Creating statement...");
             stmt = conn.createStatement();
-            
+
             String sql = "SELECT * FROM Information";
             ResultSet rs = stmt.executeQuery(sql);
 
-            System.out.println("\n\t\t    *** Personal Information ***");
+            System.out.println("\n\t   *** Personal Information ***\n");
             pi = new ArrayList();
-     
+
             while (rs.next()) {
                 int id = rs.getInt("id");
                 int accID = rs.getInt("ACC_ID");
@@ -82,11 +85,11 @@ public class Personal_Information_Interface {
         } catch (Exception e) {
             //Handle errors for Class.forName
             e.printStackTrace();
-        } 
+        }
 //        System.out.println("Retrieved!");
     }
-    
-    public void createToDB() {
+
+    public boolean createToDB() {
         java.sql.Connection conn;
         Statement stmt;
         String fname, lname, age;
@@ -119,7 +122,7 @@ public class Personal_Information_Interface {
             //STEP 4: Execute a query
 //            System.out.println("Creating statement...");
             stmt = conn.createStatement();
-            String sql = "INSERT INTO Information (ACC_ID, firstname, lastname, age) VALUES ('"+account_id+"', '"+fname+"', '"+lname+"', '"+age+"')";
+            String sql = "INSERT INTO Information (ACC_ID, firstname, lastname, age) VALUES ('" + account_id + "', '" + fname + "', '" + lname + "', '" + age + "')";
             System.out.println(sql);
             stmt.executeUpdate(sql);
             stmt.close();
@@ -132,13 +135,14 @@ public class Personal_Information_Interface {
             e.printStackTrace();
         }
         System.out.println("Saved!");
+        return true;
     }
 
-    public void update(int acc_id) throws IOException {
+    public boolean update(int acc_id) throws IOException {
         java.sql.Connection conn;
         Statement stmt;
         String fname = null, lname = null, age = null;
-        
+
         try {
             //STEP 2: Register JDBC driver
             Class.forName(JDBC_DRIVER);
@@ -152,8 +156,8 @@ public class Personal_Information_Interface {
             stmt = conn.createStatement();
             for (int i = 0; i < pi.size(); i++) {
                 if (pi.get(i).getAccount_id() == acc_id) {
-                    System.out.println("\t\t    *** Personal Information ***");
-                    System.out.println(pi.get(i).getId() + "\t" + pi.get(i).getAccount_id() + "\t" + pi.get(i).getFname() + "\t" + pi.get(i).getLname() + "\t" + pi.get(i).getAge());
+                    System.out.println("\t    *** Personal Information ***\n");
+                    System.out.println(pi.get(i).getId() + "\t\t" + pi.get(i).getAccount_id() + "\t\t" + pi.get(i).getFname() + "\t\t" + pi.get(i).getLname() + "\t\t" + pi.get(i).getAge());
                     System.out.print("\nEnter new first name : ");
                     fname = input1.next();
                     while (!Check.isString(fname)) {
@@ -167,40 +171,69 @@ public class Personal_Information_Interface {
                         update(acc_id);
                     }
                     System.out.print("Enter new age : ");
-                    age = input2.next();
+                    age = input3.next();
                     while (Check.isString(age)) {
                         System.out.println("Age is not a string.");
                         update(acc_id);
                     }
-                    String sql = "UPDATE Information SET `firstname` = '" + fname + "', `lastname` = '" + lname + "', `age` = '" + age + "' WHERE 'ID' = '" + pi.get(i).getId() +"'";
+                    String sql = "UPDATE Information SET `ACC_ID` = '" + acc_id + "', `firstname` = '" + fname + "', `lastname` = '" + lname + "', `age` = '" + age + "' WHERE `ID` = '" + pi.get(i).getId() + "'";
                     System.out.println(sql);
                     stmt.executeUpdate(sql);
+                    System.out.println("Saved!");
+                    return true;
                 } else if (pi.get(i).getAccount_id() != acc_id && i == pi.size() - 1 && fname == null && lname == null && age == null) {
+                    System.out.println("\t\t    *** Personal Information ***");
                     System.out.print("Enter first name : ");
-                    fname = input1.nextLine();
+                    fname = input4.nextLine();
                     while (!Check.isString(fname)) {
                         System.out.println("First name does not contain any number.");
                         update(acc_id);
                     }
                     System.out.print("Enter last name : ");
-                    lname = input2.nextLine();
+                    lname = input5.nextLine();
                     while (!Check.isString(lname)) {
                         System.out.println("Last name does not contain any number.");
                         update(acc_id);
                     }
                     System.out.print("Enter age : ");
-                    age = input3.nextLine();
+                    age = input6.nextLine();
                     while (Check.isString(age)) {
                         System.out.println("Age is not a string.");
                         update(acc_id);
                     }
-                    String sql = "INSERT INTO Information (ACC_ID, firstname, lastname, age) VALUES ('"+account_id+"', '"+fname+"', '"+lname+"', '"+age+"')";
+                    String sql = "INSERT INTO Information (ACC_ID, firstname, lastname, age) VALUES ('" + acc_id + "', '" + fname + "', '" + lname + "', '" + age + "')";
                     System.out.println(sql);
                     stmt.executeUpdate(sql);
-                    break;
+                    System.out.println("Saved!");
+                    return true;
                 }
             }
-            
+            if (acc_id == 1) {
+                System.out.println("\t\t    *** Personal Information ***");
+                System.out.print("Enter first name : ");
+                fname = input1.nextLine();
+                while (!Check.isString(fname)) {
+                    System.out.println("First name does not contain any number.");
+                    update(acc_id);
+                }
+                System.out.print("Enter last name : ");
+                lname = input2.nextLine();
+                while (!Check.isString(lname)) {
+                    System.out.println("Last name does not contain any number.");
+                    update(acc_id);
+                }
+                System.out.print("Enter age : ");
+                age = input3.nextLine();
+                while (Check.isString(age)) {
+                    System.out.println("Age is not a string.");
+                    update(acc_id);
+                }
+                String sql = "INSERT INTO Information (ACC_ID, firstname, lastname, age) VALUES ('" + account_id + "', '" + fname + "', '" + lname + "', '" + age + "')";
+                System.out.println(sql);
+                stmt.executeUpdate(sql);
+                System.out.println("Saved!");
+                return true;
+            }
             stmt.close();
             conn.close();
         } catch (SQLException se) {
@@ -210,11 +243,7 @@ public class Personal_Information_Interface {
             //Handle errors for Class.forName
             e.printStackTrace();
         }
-        System.out.println("Saved!");
-//                PDATE `schedule` SET `ACC_ID` = '2', `title` = 'Web Dev 2', `schedule` = 'TTH' WHERE `schedule`.`ID` = 2;
-            
-       
-
+        return false;
     }
 
     public void delete(int acc_id) {
