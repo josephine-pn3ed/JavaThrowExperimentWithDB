@@ -4,7 +4,7 @@ Table : Account
 
 Column : ID, int, 11, PRIMARY
 
-Column : username. varchar, 32, UNIQUE
+Column : username, varchar, 32, UNIQUE
 
 Column : Password, varchar, 32, INDEX
 
