@@ -5,23 +5,15 @@
  */
 package javathrowexperiment;
 
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
 import java.util.ArrayList;
 import static java.util.Objects.hash;
 import java.util.Scanner;
 import static javathrowexperiment.Accounts.account_id;
-import java.sql.*;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.Statement;
 import java.sql.SQLException;
-import java.util.List;
 
 /**
  *
@@ -29,7 +21,7 @@ import java.util.List;
  */
 public class Accounts_Interface {
 
-    ArrayList<Accounts> a = new ArrayList();
+    static ArrayList<Accounts> a = new ArrayList();
     Scanner input1 = new Scanner(System.in);
     Scanner input2 = new Scanner(System.in);
     Scanner input3 = new Scanner(System.in);
@@ -37,50 +29,26 @@ public class Accounts_Interface {
     static final String JDBC_DRIVER = "com.mysql.jdbc.Driver";
     static final String DB_URL = "jdbc:mysql://localhost/account";
 
-    //  Database credentials
     static final String USER = "root";
     static final String PASS = "";
+    Connection conn;
+    Statement stmt;
+    ResultSet rs;
+    String username, password, confirm;
 
     public Accounts_Interface() {
     }
 
-    public void retrieveDatabase() {
-        Connection conn;
-        Statement stmt;
-        a = new ArrayList();
+    void connect(String pro) {
         try {
-            //STEP 2: Register JDBC driver
             Class.forName(JDBC_DRIVER);
-
-            //STEP 3: Open a connection
-//            System.out.println("Connecting to database...");
             conn = DriverManager.getConnection(DB_URL, USER, PASS);
-
-            //STEP 4: Execute a query
-//            System.out.println("Creating statement...");
             stmt = conn.createStatement();
-
-            String sql = "SELECT * FROM account";
-            ResultSet rs = stmt.executeQuery(sql);
-
-            System.out.println("--- RETRIEVE ---");
-            System.out.println("\n\t\t*** Accounts ***\n");
-
-            while (rs.next()) {
-                int id = rs.getInt("id");
-                String username = rs.getString("username");
-                String password = rs.getString("password");
-                System.out.println(id + "\t\t" + username + "\t\t" + password + "\t\t");
-                a.add(new Accounts(id, username, password));
+            if ("r".equals(pro)) {
+                retrieveDatabase();
+            } else if ("c".equals(pro)) {
+                createToDB();
             }
-            if (a.size() == 0) {
-                account_id = 1;
-            } else {
-                account_id = a.get(a.size() - 1).getAcc_id();
-
-            }
-//            STEP 6: Clean-up environment
-            rs.close();
             stmt.close();
             conn.close();
         } catch (SQLException se) {
@@ -90,13 +58,31 @@ public class Accounts_Interface {
             //Handle errors for Class.forName
             e.printStackTrace();
         }
-//        System.out.println("Retrieved!");
     }
 
-    public void createToDB() {
-        Connection conn;
-        Statement stmt;
-        String username, password, confirm;
+    public void retrieveDatabase() throws SQLException {
+        a = new ArrayList();
+        String sql = "SELECT * FROM account";
+        rs = stmt.executeQuery(sql);
+
+        System.out.println("--- RETRIEVE ---");
+        System.out.println("\n\t\t*** Accounts ***\n");
+
+        while (rs.next()) {
+            int id = rs.getInt("id");
+            username = rs.getString("username");
+            password = rs.getString("password");
+            System.out.println(id + "\t\t" + username + "\t\t" + password + "\t\t");
+            a.add(new Accounts(id, username, password));
+        }
+        if (a.isEmpty()) {
+            account_id = 1;
+        } else {
+            account_id = a.get(a.size() - 1).getAcc_id();
+        }
+    }
+
+    public void createToDB() throws SQLException {
         System.out.print("\n--- CREATE ---\nEnter username : ");
         username = input1.next();
         while (!Check.isString(username)) {
@@ -129,32 +115,10 @@ public class Accounts_Interface {
                 System.out.println(ex);
             }
         }
-        try {
-            //STEP 2: Register JDBC driver
-            Class.forName(JDBC_DRIVER);
-
-            //STEP 3: Open a connection
-//            System.out.println("Connecting to database...");
-            conn = DriverManager.getConnection(DB_URL, USER, PASS);
-
-            //STEP 4: Execute a query
-//            System.out.println("Creating statement...");
-            stmt = conn.createStatement();
-            String sql = "INSERT INTO Account (username, password) VALUES ";
-
-            sql += "('" + username + "', '" + hash(password.toCharArray()) + "')";
-            System.out.println(sql);
-            stmt.executeUpdate(sql);
-            ++account_id;
-            stmt.close();
-            conn.close();
-        } catch (SQLException se) {
-            //Handle errors for JDBC
-            se.printStackTrace();
-        } catch (Exception e) {
-            //Handle errors for Class.forName
-            e.printStackTrace();
-        }
+        String sql = "INSERT INTO Account (username, password) VALUES ";
+        sql += "('" + username + "', '" + hash(password.toCharArray()) + "')";
+        stmt.executeUpdate(sql);
+        ++account_id;
         System.out.println("Saved!");
     }
 
